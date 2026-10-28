@@ -1,0 +1,115 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Affectations</h1>
+      <p class="muted">{{ assignments.page().totalElements }} affectation(s)</p>
+    </div>
+    <a *appIfAllowed="'assignments.write'" class="btn btn-primary" routerLink="nouvelle">Nouvelle affectation</a>
+  </header>
+
+  <div class="toolbar">
+    <input
+      class="input"
+      type="search"
+      placeholder="N° de bon, chauffeur, matricule, équipement…"
+      aria-label="Rechercher une affectation"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <label class="checkbox">
+      <input type="checkbox" [checked]="activeOnly()" (change)="onActiveOnly($any($event.target).checked)" />
+      Affectations en cours uniquement
+    </label>
+  </div>
+
+  @if (feedback(); as message) {
+    <p class="alert alert-success" role="status">{{ message }}</p>
+  }
+  @if (assignments.error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  @if (returning(); as current) {
+    <form class="card return-panel" [formGroup]="returnForm" (ngSubmit)="confirmReturn()">
+      <h2>Restitution de {{ current.equipmentCode }}</h2>
+      <p>{{ current.equipmentLabel }} — détenu par {{ current.driverName }} depuis le {{ current.assignedAt | date: 'dd/MM/yyyy' }}</p>
+      <div class="form-grid">
+        <label class="field">
+          <span>État constaté *</span>
+          <select class="input" formControlName="conditionIn">
+            @for (item of conditions; track item) {
+              <option [value]="item">{{ conditionLabels[item] }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field-wide">
+          <span>Observations</span>
+          <input class="input" formControlName="notes" placeholder="Accessoires manquants, rayures…" />
+        </label>
+      </div>
+      <p class="muted">{{ returnOutcome() }}</p>
+      @if (returnError(); as message) {
+        <p class="alert alert-danger" role="alert">{{ message }}</p>
+      }
+      <div class="form-actions">
+        <button type="button" class="btn" (click)="cancelReturn()">Annuler</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement…' : 'Confirmer la restitution' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  <div class="card table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bon</th>
+          <th>Chauffeur</th>
+          <th>Équipement</th>
+          <th>Remis le</th>
+          <th>Par</th>
+          <th>Statut</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of assignments.page().content; track a.id) {
+          <tr>
+            <td>{{ a.receiptNumber }}</td>
+            <td><a [routerLink]="['/chauffeurs', a.driverId]">{{ a.driverName }}</a> <span class="muted">{{ a.driverMatricule }}</span></td>
+            <td>{{ a.equipmentCode }} · {{ a.equipmentLabel }}</td>
+            <td>{{ a.assignedAt | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ a.assignedBy }}</td>
+            <td>
+              @if (isActive(a)) {
+                <app-status-badge label="En cours" tone="info" />
+              } @else {
+                <app-status-badge [label]="'Rendu le ' + (a.returnedAt | date: 'dd/MM/yyyy')" tone="neutral" />
+              }
+            </td>
+            <td class="actions">
+              @if (isActive(a)) {
+                <button *appIfAllowed="'assignments.write'" type="button" class="btn btn-sm" (click)="openReturn(a)">
+                  Restituer
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty">
+              {{ assignments.loading() ? 'Chargement…' : 'Aucune affectation ne correspond à la recherche.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="assignments.page().page"
+    [totalPages]="assignments.page().totalPages"
+    (pageChange)="pageIndex.set($event)"
+  />
+</section>

@@ -1,0 +1,26 @@
+<div class="shell" [class.menu-open]="menuOpen()">
+  <aside class="sidebar">
+    <div class="brand">KAI <span>Chauffeurs & parc</span></div>
+    <nav aria-label="Navigation principale">
+      @for (item of navItems(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" (click)="menuOpen.set(false)">{{ item.label }}</a>
+      }
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="btn btn-sm menu-toggle" (click)="menuOpen.set(!menuOpen())" aria-label="Ouvrir le menu">
+        Menu
+      </button>
+      <div class="user">
+        <strong>{{ user()?.fullName }}</strong>
+        <span class="muted">{{ roleLabel() }}</span>
+      </div>
+      <button type="button" class="btn btn-sm" (click)="logout()">Se déconnecter</button>
+    </header>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

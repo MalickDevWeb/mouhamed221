@@ -1,0 +1,73 @@
+<section class="page">
+  <header class="page-header">
+    <h1>{{ id() ? "Modifier l'équipement" : 'Nouvel équipement' }}</h1>
+  </header>
+
+  @if (error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement de l'équipement…</p>
+  } @else {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span>Catégorie *</span>
+          <select class="input" formControlName="category">
+            @for (item of categories; track item) {
+              <option [value]="item">{{ categoryLabels[item] }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Marque *</span>
+          <input class="input" formControlName="brand" />
+          <app-field-error [control]="form.controls.brand" />
+        </label>
+        <label class="field">
+          <span>Modèle *</span>
+          <input class="input" formControlName="model" />
+          <app-field-error [control]="form.controls.model" />
+        </label>
+        <label class="field">
+          <span>N° de série *</span>
+          <input class="input" formControlName="serialNumber" />
+          <app-field-error [control]="form.controls.serialNumber" />
+        </label>
+        @if (isPhone()) {
+          <label class="field">
+            <span>IMEI *</span>
+            <input class="input" formControlName="imei" inputmode="numeric" maxlength="15" />
+            <app-field-error [control]="form.controls.imei" />
+          </label>
+        }
+        <label class="field">
+          <span>État physique *</span>
+          <select class="input" formControlName="condition">
+            @for (item of conditions; track item) {
+              <option [value]="item">{{ conditionLabels[item] }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Date d'acquisition</span>
+          <input class="input" type="date" formControlName="acquisitionDate" />
+        </label>
+        <label class="field">
+          <span>Fin de garantie</span>
+          <input class="input" type="date" formControlName="warrantyEndDate" />
+        </label>
+      </div>
+
+      <p class="muted">Le statut (disponible, attribué…) évolue uniquement par les affectations, restitutions et incidents.</p>
+
+      <div class="form-actions">
+        <a class="btn" routerLink="/equipements">Annuler</a>
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

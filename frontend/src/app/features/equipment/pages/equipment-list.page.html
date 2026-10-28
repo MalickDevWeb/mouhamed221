@@ -1,0 +1,81 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Parc informatique</h1>
+      <p class="muted">{{ equipment.page().totalElements }} équipement(s)</p>
+    </div>
+    <a *appIfAllowed="'equipment.write'" class="btn btn-primary" routerLink="nouveau">Nouvel équipement</a>
+  </header>
+
+  <div class="toolbar">
+    <input
+      class="input"
+      type="search"
+      placeholder="Code, n° de série, IMEI, marque…"
+      aria-label="Rechercher un équipement"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <select class="input" aria-label="Filtrer par catégorie" (change)="onCategory($any($event.target).value)">
+      <option value="">Toutes les catégories</option>
+      @for (item of categories; track item) {
+        <option [value]="item" [selected]="item === category()">{{ categoryLabels[item] }}</option>
+      }
+    </select>
+    <select class="input" aria-label="Filtrer par statut" (change)="onStatus($any($event.target).value)">
+      <option value="">Tous les statuts</option>
+      @for (item of statuses; track item) {
+        <option [value]="item" [selected]="item === status()">{{ statusLabels[item] }}</option>
+      }
+    </select>
+  </div>
+
+  @if (equipment.error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  <div class="card table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Catégorie</th>
+          <th>Marque / modèle</th>
+          <th>N° de série</th>
+          <th>IMEI</th>
+          <th>État</th>
+          <th>Statut</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of equipment.page().content; track item.id) {
+          <tr>
+            <td>{{ item.code }}</td>
+            <td>{{ categoryLabels[item.category] }}</td>
+            <td>{{ item.brand }} {{ item.model }}</td>
+            <td>{{ item.serialNumber }}</td>
+            <td>{{ item.imei ?? '—' }}</td>
+            <td>{{ conditionLabels[item.condition] }}</td>
+            <td><app-status-badge [label]="statusLabels[item.status]" [tone]="statusTones[item.status]" /></td>
+            <td class="actions">
+              <a *appIfAllowed="'equipment.write'" class="btn btn-sm" [routerLink]="[item.id, 'modifier']">Modifier</a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="empty">
+              {{ equipment.loading() ? 'Chargement…' : 'Aucun équipement ne correspond à la recherche.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="equipment.page().page"
+    [totalPages]="equipment.page().totalPages"
+    (pageChange)="pageIndex.set($event)"
+  />
+</section>

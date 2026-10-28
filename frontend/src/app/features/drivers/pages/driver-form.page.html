@@ -1,0 +1,97 @@
+<section class="page">
+  <header class="page-header">
+    <h1>{{ id() ? 'Modifier le chauffeur' : 'Nouveau chauffeur' }}</h1>
+  </header>
+
+  @if (error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement du dossier…</p>
+  } @else {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h2>Identité</h2>
+      <div class="form-grid">
+        <label class="field">
+          <span>Nom *</span>
+          <input class="input" formControlName="lastName" />
+          <app-field-error [control]="form.controls.lastName" />
+        </label>
+        <label class="field">
+          <span>Prénom *</span>
+          <input class="input" formControlName="firstName" />
+          <app-field-error [control]="form.controls.firstName" />
+        </label>
+        <label class="field">
+          <span>Date de naissance *</span>
+          <input class="input" type="date" formControlName="birthDate" />
+          <app-field-error [control]="form.controls.birthDate" />
+        </label>
+        <label class="field">
+          <span>N° de pièce d'identité (CNI) *</span>
+          <input class="input" formControlName="idCardNumber" />
+          <app-field-error [control]="form.controls.idCardNumber" />
+        </label>
+        <label class="field">
+          <span>N° de permis de conduire *</span>
+          <input class="input" formControlName="licenseNumber" />
+          <app-field-error [control]="form.controls.licenseNumber" />
+        </label>
+      </div>
+
+      <h2>Coordonnées</h2>
+      <div class="form-grid">
+        <label class="field">
+          <span>Téléphone *</span>
+          <input class="input" type="tel" formControlName="phone" placeholder="+221771234567" />
+          <app-field-error [control]="form.controls.phone" />
+        </label>
+        <label class="field">
+          <span>E-mail</span>
+          <input class="input" type="email" formControlName="email" />
+          <app-field-error [control]="form.controls.email" />
+        </label>
+        <label class="field field-wide">
+          <span>Adresse *</span>
+          <input class="input" formControlName="address" />
+          <app-field-error [control]="form.controls.address" />
+        </label>
+      </div>
+
+      <h2>Affectation</h2>
+      <div class="form-grid">
+        <label class="field">
+          <span>Site *</span>
+          <select class="input" formControlName="site">
+            <option value="" disabled>Choisir un site</option>
+            @for (site of sites; track site) {
+              <option [value]="site">{{ site }}</option>
+            }
+          </select>
+          <app-field-error [control]="form.controls.site" />
+        </label>
+        <label class="field">
+          <span>Date d'entrée *</span>
+          <input class="input" type="date" formControlName="hireDate" />
+          <app-field-error [control]="form.controls.hireDate" />
+        </label>
+        <label class="field">
+          <span>Statut *</span>
+          <select class="input" formControlName="status">
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabels[status] }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn" [routerLink]="id() ? ['/chauffeurs', id()] : ['/chauffeurs']">Annuler</a>
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement…' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

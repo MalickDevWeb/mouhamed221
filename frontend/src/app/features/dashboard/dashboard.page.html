@@ -1,0 +1,55 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Tableau de bord</h1>
+  </header>
+
+  @switch (state().kind) {
+    @case ('loading') {
+      <p class="muted">Chargement des indicateurs…</p>
+    }
+    @case ('error') {
+      <p class="alert alert-danger">Impossible de charger les indicateurs.</p>
+    }
+  }
+
+  @if (summary(); as s) {
+    <div class="kpi-grid">
+      <a class="card kpi" routerLink="/chauffeurs">
+        <span class="kpi-label">Chauffeurs actifs</span>
+        <strong class="kpi-value">{{ s.driversByStatus.ACTIF }}</strong>
+      </a>
+      <a class="card kpi" routerLink="/affectations">
+        <span class="kpi-label">Affectations actives</span>
+        <strong class="kpi-value">{{ s.activeAssignments }}</strong>
+      </a>
+      <a class="card kpi" routerLink="/equipements">
+        <span class="kpi-label">Équipements disponibles</span>
+        <strong class="kpi-value">{{ s.equipmentByStatus.DISPONIBLE }}</strong>
+      </a>
+      <div class="card kpi" [class.kpi-alert]="s.utilizationRate < 0.6 || s.utilizationRate > 0.95">
+        <span class="kpi-label">Taux d'utilisation du parc</span>
+        <strong class="kpi-value">{{ s.utilizationRate | percent: '1.0-0' }}</strong>
+        <span class="muted">Seuil d'alerte : hors de 60 % à 95 %</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Chauffeurs par statut</h2>
+        <dl class="stat-list">
+          @for (status of driverStatuses; track status) {
+            <div><dt>{{ driverLabels[status] }}</dt><dd>{{ s.driversByStatus[status] }}</dd></div>
+          }
+        </dl>
+      </section>
+      <section class="card">
+        <h2>Parc par statut</h2>
+        <dl class="stat-list">
+          @for (status of equipmentStatuses; track status) {
+            <div><dt>{{ equipmentLabels[status] }}</dt><dd>{{ s.equipmentByStatus[status] }}</dd></div>
+          }
+        </dl>
+      </section>
+    </div>
+  }
+</section>

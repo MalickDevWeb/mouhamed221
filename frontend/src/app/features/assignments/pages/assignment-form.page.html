@@ -1,0 +1,64 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Nouvelle affectation</h1>
+  </header>
+
+  @if (error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement des chauffeurs et des équipements disponibles…</p>
+  } @else {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span>Chauffeur (actifs uniquement) *</span>
+          <select class="input" formControlName="driverId">
+            <option value="" disabled>Choisir un chauffeur</option>
+            @for (driver of driverOptions(); track driver.id) {
+              <option [value]="driver.id">{{ fullName(driver) }} — {{ driver.matricule }}</option>
+            }
+          </select>
+          <app-field-error [control]="form.controls.driverId" />
+        </label>
+        <label class="field">
+          <span>Équipement (disponibles uniquement) *</span>
+          <select class="input" formControlName="equipmentId">
+            <option value="" disabled>Choisir un équipement</option>
+            @for (item of equipmentOptions(); track item.id) {
+              <option [value]="item.id">{{ item.code }} · {{ categoryLabels[item.category] }} · {{ label(item) }}</option>
+            }
+          </select>
+          <app-field-error [control]="form.controls.equipmentId" />
+        </label>
+        <label class="field">
+          <span>État au départ *</span>
+          <select class="input" formControlName="conditionOut">
+            @for (item of conditions; track item) {
+              <option [value]="item">{{ conditionLabels[item] }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field-wide">
+          <span>Observations</span>
+          <input class="input" formControlName="notes" placeholder="Accessoires remis, remarques…" />
+          <app-field-error [control]="form.controls.notes" />
+        </label>
+      </div>
+
+      @for (message of violations(); track message) {
+        <p class="alert alert-warning" role="alert">{{ message }}</p>
+      }
+
+      <p class="muted">Le bon de remise PDF à faire signer sera généré au sprint 4 (EF-25).</p>
+
+      <div class="form-actions">
+        <a class="btn" routerLink="/affectations">Annuler</a>
+        <button class="btn btn-primary" type="submit" [disabled]="saving() || violations().length > 0">
+          {{ saving() ? 'Enregistrement…' : "Valider l'affectation" }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,0 +1,77 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Chauffeurs</h1>
+      <p class="muted">{{ drivers.page().totalElements }} dossier(s)</p>
+    </div>
+    <a *appIfAllowed="'drivers.write'" class="btn btn-primary" routerLink="nouveau">Nouveau chauffeur</a>
+  </header>
+
+  <div class="toolbar">
+    <input
+      class="input"
+      type="search"
+      placeholder="Nom, matricule, téléphone, permis, CNI…"
+      aria-label="Rechercher un chauffeur"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <select class="input" aria-label="Filtrer par statut" (change)="onStatus($any($event.target).value)">
+      <option value="">Tous les statuts</option>
+      @for (item of statuses; track item) {
+        <option [value]="item" [selected]="item === status()">{{ statusLabels[item] }}</option>
+      }
+    </select>
+    <select class="input" aria-label="Filtrer par site" (change)="onSite($any($event.target).value)">
+      <option value="">Tous les sites</option>
+      @for (item of sites; track item) {
+        <option [value]="item" [selected]="item === site()">{{ item }}</option>
+      }
+    </select>
+  </div>
+
+  @if (drivers.error(); as message) {
+    <p class="alert alert-danger" role="alert">{{ message }}</p>
+  }
+
+  <div class="card table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Matricule</th>
+          <th>Nom</th>
+          <th>Téléphone</th>
+          <th>Site</th>
+          <th>Statut</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (driver of drivers.page().content; track driver.id) {
+          <tr>
+            <td>{{ driver.matricule }}</td>
+            <td><a [routerLink]="driver.id">{{ fullName(driver) }}</a></td>
+            <td>{{ driver.phone }}</td>
+            <td>{{ driver.site }}</td>
+            <td><app-status-badge [label]="statusLabels[driver.status]" [tone]="statusTones[driver.status]" /></td>
+            <td class="actions">
+              <a *appIfAllowed="'drivers.write'" class="btn btn-sm" [routerLink]="[driver.id, 'modifier']">Modifier</a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty">
+              {{ drivers.loading() ? 'Chargement…' : 'Aucun chauffeur ne correspond à la recherche.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="drivers.page().page"
+    [totalPages]="drivers.page().totalPages"
+    (pageChange)="pageIndex.set($event)"
+  />
+</section>
