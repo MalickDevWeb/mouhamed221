@@ -1,26 +1,264 @@
-<div class="shell" [class.menu-open]="menuOpen()">
-  <aside class="sidebar">
-    <div class="brand">KAI <span>Chauffeurs & parc</span></div>
-    <nav aria-label="Navigation principale">
-      @for (item of navItems(); track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="active" (click)="menuOpen.set(false)">{{ item.label }}</a>
-      }
-    </nav>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
-      <button type="button" class="btn btn-sm menu-toggle" (click)="menuOpen.set(!menuOpen())" aria-label="Ouvrir le menu">
-        Menu
-      </button>
-      <div class="user">
-        <strong>{{ user()?.fullName }}</strong>
-        <span class="muted">{{ roleLabel() }}</span>
+<div id="app">
+  <div class="mobile-shade" [class.open]="menuOpen()" (click)="menuOpen.set(false)"></div>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" [class.open]="menuOpen()">
+      <div class="brand">
+        <div class="brand-mark">K</div>
+        <div>
+          <div class="brand-title">KAI</div>
+          <div class="brand-sub">FLEET &amp; OPERATIONS</div>
+        </div>
       </div>
-      <button type="button" class="btn btn-sm" (click)="logout()">Se déconnecter</button>
-    </header>
-    <main class="content">
-      <router-outlet />
-    </main>
+
+      @for (group of navGroups; track group.heading) {
+        <div class="nav-heading">{{ group.heading }}</div>
+        <nav class="navigation">
+          @for (item of group.items; track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              (click)="menuOpen.set(false)"
+            >
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+              @if (item.badge) {
+                <span class="nav-count">{{ item.badge }}</span>
+              }
+            </a>
+          }
+        </nav>
+      }
+
+      <div class="sidebar-bottom">
+        <div class="help-mini">
+          <strong>Besoin d'aide ?</strong>
+          <p>Accédez aux repères pour prendre en main votre espace KAI.</p>
+          <button type="button" (click)="openHelp()">Guide de démarrage ↗</button>
+        </div>
+        <div class="account-mini" (click)="openRoleModal()">
+          <div class="avatar">{{ userInitials() }}</div>
+          <div>
+            <strong>{{ userFullName() }}</strong>
+            <small>{{ userRoleLabel() }}</small>
+          </div>
+          <span class="account-chevron">⌄</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Workspace -->
+    <section class="workspace">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="top-left">
+          <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Ouvrir le menu"
+            (click)="menuOpen.set(!menuOpen())"
+          >
+            ☰
+          </button>
+          <div class="page-title-top" id="topTitle">KAI Analytics</div>
+        </div>
+
+        <div class="top-right">
+          <label class="global-search">
+            <span>⌕</span>
+            <input id="globalSearch" type="search" placeholder="Rechercher dans KAI…" aria-label="Recherche globale" />
+          </label>
+
+          <button class="top-icon" id="notificationsButton" type="button" aria-label="Notifications">
+            ♧<span class="dot"></span>
+          </button>
+
+          <button class="top-icon" id="messagesButton" type="button" aria-label="Messages">
+            ✉
+          </button>
+
+          <button
+            class="top-icon"
+            id="kaiLogoutButton"
+            type="button"
+            aria-label="Se déconnecter"
+            title="Se déconnecter"
+            (click)="confirmLogout()"
+          >
+            ↪
+          </button>
+
+          <button class="profile-menu" id="profileButton" type="button" (click)="openRoleModal()">
+            <span class="avatar">{{ userInitials() }}</span>
+            <span class="profile-name">
+              <strong>{{ userShortName() }}</strong>
+              <small>{{ userRoleLabel() }}</small>
+            </span>
+            <span class="chev">⌄</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main" id="mainContent">
+        <router-outlet />
+      </main>
+    </section>
   </div>
 </div>
+
+<!-- Modal: Role Switcher -->
+<div class="overlay" [class.open]="roleModalOpen()" role="presentation">
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog-head">
+      <h2 id="dialogTitle">Profil &amp; rôle actif</h2>
+      <button class="dialog-close" type="button" aria-label="Fermer" (click)="closeRoleModal()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="role-intro">
+        Changez de profil pour tester les écrans, les priorités et les autorisations propres à chaque cas d’usage.
+      </p>
+      <div class="role-picker-grid">
+        <button
+          type="button"
+          class="role-option"
+          [class.current]="activeProfileId() === 'admin'"
+          (click)="selectProfile('admin')"
+        >
+          <span class="role-option-avatar">AD</span>
+          <span>
+            <strong>Administratrice</strong>
+            <small>Accès complet · pilotage, utilisateurs, paramétrage et audit.</small>
+          </span>
+          @if (activeProfileId() === 'admin') {
+            <span class="role-check">✓</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="role-option"
+          [class.current]="activeProfileId() === 'manager'"
+          (click)="selectProfile('manager')"
+        >
+          <span class="role-option-avatar">MC</span>
+          <span>
+            <strong>Gestionnaire de parc</strong>
+            <small>Priorité au parc, aux affectations, aux disponibilités et aux restitutions.</small>
+          </span>
+          @if (activeProfileId() === 'manager') {
+            <span class="role-check">✓</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="role-option"
+          [class.current]="activeProfileId() === 'technician'"
+          (click)="selectProfile('technician')"
+        >
+          <span class="role-option-avatar">KF</span>
+          <span>
+            <strong>Technicienne</strong>
+            <small>File d’intervention, incidents, équipements à diagnostiquer et enrôlements.</small>
+          </span>
+          @if (activeProfileId() === 'technician') {
+            <span class="role-check">✓</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="role-option"
+          [class.current]="activeProfileId() === 'supervisor'"
+          (click)="selectProfile('supervisor')"
+        >
+          <span class="role-option-avatar">OK</span>
+          <span>
+            <strong>Superviseur</strong>
+            <small>Suivi transverse des opérations, des équipes, des incidents et des indicateurs.</small>
+          </span>
+          @if (activeProfileId() === 'supervisor') {
+            <span class="role-check">✓</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="role-option"
+          [class.current]="activeProfileId() === 'reader'"
+          (click)="selectProfile('reader')"
+        >
+          <span class="role-option-avatar">FS</span>
+          <span>
+            <strong>Lecteur / Auditeur</strong>
+            <small>Consultation et export des indicateurs, inventaires et historiques. Aucune modification.</small>
+          </span>
+          @if (activeProfileId() === 'reader') {
+            <span class="role-check">✓</span>
+          }
+        </button>
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <button class="btn" type="button" (click)="closeRoleModal()">Fermer</button>
+    </div>
+  </section>
+</div>
+
+<!-- Modal: Confirm Logout -->
+<div class="overlay" [class.open]="logoutModalOpen()" role="presentation">
+  <section class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <h2>Confirmer la déconnexion</h2>
+      <button class="dialog-close" type="button" aria-label="Fermer" (click)="closeLogoutModal()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-info">
+        Vous allez quitter la session de démonstration KAI. Vous pourrez vous reconnecter à tout moment.
+      </p>
+    </div>
+    <div class="dialog-foot">
+      <button class="btn" type="button" (click)="closeLogoutModal()">Rester connecté</button>
+      <button class="btn primary" type="button" (click)="executeLogout()">Se déconnecter</button>
+    </div>
+  </section>
+</div>
+
+<!-- Modal: Help Guide -->
+<div class="overlay" [class.open]="helpModalOpen()" role="presentation">
+  <section class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <h2>Guide de prise en main KAI</h2>
+      <button class="dialog-close" type="button" aria-label="Fermer" (click)="closeHelpModal()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-info">
+        Bienvenue sur la plateforme <strong>KAI · Fleet &amp; Operations</strong>.
+      </p>
+      <div class="performance-list">
+        <div class="performance-row">
+          <span class="metric-icon">1</span>
+          <span class="metric-label">Explorez le <strong>Tableau de bord</strong> pour surveiller les indicateurs clés.</span>
+        </div>
+        <div class="performance-row">
+          <span class="metric-icon blue">2</span>
+          <span class="metric-label">Gérez les <strong>Véhicules</strong>, <strong>Chauffeurs</strong> et le <strong>Parc informatique</strong>.</span>
+        </div>
+        <div class="performance-row">
+          <span class="metric-icon orange">3</span>
+          <span class="metric-label">Suivez les <strong>Affectations</strong>, les <strong>Incidents</strong> et les <strong>Intégrations</strong>.</span>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <button class="btn primary" type="button" (click)="closeHelpModal()">Compris</button>
+    </div>
+  </section>
+</div>
+
+<!-- Toast -->
+@if (toastMessage(); as msg) {
+  <div class="toast show" role="status">{{ msg }}</div>
+}

@@ -1,0 +1,580 @@
+@if (moduleKey() === 'analytics') {
+  <!-- Vue Analytics -->
+  <div class="page-head">
+    <div>
+      <div class="kicker">Pilotage &amp; indicateurs</div>
+      <h1>Analytics</h1>
+      <p>Vue de synthèse sur les opérations et les coûts de la flotte.</p>
+    </div>
+    <div class="head-actions">
+      <div class="date-control">
+        <span class="calendar">▦</span>
+        <strong>01 oct. – 28 oct. 2026</strong>
+      </div>
+      <button class="btn" (click)="exportCSV()">⇩ Exporter</button>
+    </div>
+  </div>
+
+  <section class="kpis">
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-label">Véhicules actifs</span>
+        <span class="kpi-icon">▰</span>
+      </div>
+      <div class="kpi-bottom">
+        <strong class="kpi-value">124</strong>
+        <span class="trend">↗ +2,4 %</span>
+      </div>
+      <div class="kpi-foot">par rapport au mois précédent</div>
+    </article>
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-label">Chauffeurs actifs</span>
+        <span class="kpi-icon">♙</span>
+      </div>
+      <div class="kpi-bottom">
+        <strong class="kpi-value">87</strong>
+        <span class="trend">↗ +1,8 %</span>
+      </div>
+      <div class="kpi-foot">sur 92 dossiers validés</div>
+    </article>
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-label">Interventions en cours</span>
+        <span class="kpi-icon">⚒</span>
+      </div>
+      <div class="kpi-bottom">
+        <strong class="kpi-value">12</strong>
+        <span class="trend down">↘ −1,5 %</span>
+      </div>
+      <div class="kpi-foot">3 demandent une attention</div>
+    </article>
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-label">Coût total de la période</span>
+        <span class="kpi-icon">◉</span>
+      </div>
+      <div class="kpi-bottom">
+        <strong class="kpi-value currency">84 196 500 <small style="font-size:10px;letter-spacing:0">FCFA</small></strong>
+        <span class="trend">↗ +3,1 %</span>
+      </div>
+      <div class="kpi-foot">Montant fictif pour la maquette</div>
+    </article>
+  </section>
+
+  <section class="grid two-col">
+    <article class="card">
+      <div class="card-body">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Répartition des dépenses</div>
+            <div class="card-sub">Répartition indicative par catégorie</div>
+          </div>
+        </div>
+        <div class="donut-layout">
+          <div class="donut-wrap">
+            <div class="donut-chart"></div>
+            <div class="donut-center">
+              <span>Total des dépenses</span>
+              <strong>84,2 M</strong>
+              <small>FCFA</small>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="legend-name"><i class="legend-dot teal" style="background:#18a88a"></i>Carburant</span><strong>26 %</strong></div>
+            <div class="legend-row"><span class="legend-name"><i class="legend-dot orange"></i>Maintenance</span><strong>13 %</strong></div>
+            <div class="legend-row"><span class="legend-name"><i class="legend-dot green"></i>Assurance</span><strong>13 %</strong></div>
+            <div class="legend-row"><span class="legend-name"><i class="legend-dot purple"></i>Pièces détachées</span><strong>16 %</strong></div>
+            <div class="legend-row"><span class="legend-name"><i class="legend-dot blue"></i>Autres</span><strong>32 %</strong></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-body">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Tendance des coûts</div>
+            <div class="card-sub">Coût moyen et fréquence des interventions</div>
+          </div>
+          <div class="segmented" style="flex-shrink:0">
+            <button [class.active]="analyticsPeriod() === 'monthly'" (click)="analyticsPeriod.set('monthly')">Mensuel</button>
+            <button [class.active]="analyticsPeriod() === 'annual'" (click)="analyticsPeriod.set('annual')">Annuel</button>
+          </div>
+        </div>
+        <div class="legend" style="margin:0 0 5px">
+          <span class="legend-item"><i class="legend-dot blue"></i>Coût moyen / véhicule</span>
+          <span class="legend-item"><i class="legend-dot" style="background:#23b187"></i>Interventions</span>
+        </div>
+        <svg class="trend-chart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="Graphique des tendances">
+          <g class="chart-grid">
+            <path d="M42 25H545 M42 69H545 M42 113H545 M42 157H545 M42 194H545"/>
+          </g>
+          <g class="chart-label">
+            <text x="4" y="29">100%</text>
+            <text x="10" y="73">75%</text>
+            <text x="10" y="117">50%</text>
+            <text x="10" y="161">25%</text>
+            <text x="22" y="198">0%</text>
+            <text x="42" y="213">Jan</text>
+            <text x="143" y="213">Fév</text>
+            <text x="244" y="213">Mars</text>
+            <text x="344" y="213">Avr</text>
+            <text x="445" y="213">Mai</text>
+            <text x="529" y="213">Juin</text>
+          </g>
+          @if (analyticsPeriod() === 'monthly') {
+            <path class="line-blue" d="M42 103 C62 90 70 91 85 94 S115 71 137 69 S166 90 188 77 S219 85 237 100 S263 111 282 103 S310 119 333 104 S360 87 381 94 S410 83 429 72 S464 92 482 86 S510 100 528 84 S538 79 545 71"/>
+            <path class="line-green" d="M42 139 C60 128 70 137 85 130 S112 145 137 135 S159 117 180 129 S210 140 236 125 S261 131 281 139 S302 151 321 139 S346 148 366 142 S392 157 410 143 S438 130 458 140 S489 151 508 142 S532 127 545 137"/>
+          } @else {
+            <path class="line-blue" d="M42 116 C60 95 77 88 98 102 S129 68 150 74 S185 99 205 85 S232 76 252 96 S275 112 297 89 S322 78 344 92 S370 110 392 83 S420 73 443 88 S468 99 490 75 S519 84 545 64"/>
+            <path class="line-green" d="M42 151 C64 132 79 142 99 133 S130 145 150 130 S178 117 201 135 S230 142 252 127 S279 145 297 140 S321 155 344 135 S373 148 393 142 S420 124 442 138 S467 153 490 135 S520 143 545 129"/>
+          }
+        </svg>
+        <div class="chart-caption">
+          <span>Source : valeurs fictives</span>
+          <span>{{ analyticsPeriod() === 'monthly' ? 'Jan – Juin 2026' : 'Année 2026' }}</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <div class="notice">
+    <span>ⓘ</span>
+    <span>Indicateurs d’illustration seulement : les calculs définitifs dépendront des données métier collectées par KAI.</span>
+  </div>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Axes d’amélioration</div>
+          <div class="card-sub">Pistes de lecture des indicateurs</div>
+        </div>
+      </div>
+      <div class="performance-list">
+        <div class="performance-row"><span class="metric-icon">✓</span><span class="metric-label">Disponibilité cible de flotte</span><strong class="metric-value">95<small>%</small></strong></div>
+        <div class="performance-row"><span class="metric-icon blue">↗</span><span class="metric-label">Suivi des interventions à échéance</span><strong class="metric-value">12</strong></div>
+        <div class="performance-row"><span class="metric-icon orange">⚑</span><span class="metric-label">Incidents ouverts à prioriser</span><strong class="metric-value">4</strong></div>
+      </div>
+    </div>
+  </section>
+
+} @else if (moduleKey() === 'importexport') {
+  <!-- Vue Import / Export -->
+  <div class="page-head">
+    <div>
+      <div class="kicker">Échanges de données</div>
+      <h1>Import / Export</h1>
+      <p>Importez des données structurées ou téléchargez un extrait CSV des listes accessibles à votre profil.</p>
+    </div>
+    <div class="head-actions">
+      <span class="profile-mode">Administratrice</span>
+    </div>
+  </div>
+
+  <div class="notice">
+    <span>ⓘ</span>
+    <span>Les importations modifient uniquement les données en mémoire de cette maquette. Vérifiez les colonnes avant de confirmer.</span>
+  </div>
+
+  <section class="grid two-col">
+    <article class="card">
+      <div class="card-body">
+        <h3 class="card-title">Exporter un module</h3>
+        <p class="card-sub" style="line-height:1.7;margin:7px 0 13px">Générez un fichier CSV avec les colonnes et les enregistrements de démonstration visibles par votre profil.</p>
+        <div class="field">
+          <label>Module à exporter</label>
+          <select [(ngModel)]="exportSelectedModule">
+            @for (modKey of availableModules(); track modKey) {
+              <option [value]="modKey">{{ modKey }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="btn primary" (click)="exportCSV(exportSelectedModule())" style="margin-top:13px">⇩ Télécharger le CSV</button>
+        <div class="notice" style="margin:13px 0 0">Format CSV séparé par des points-virgules.</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-body">
+        <h3 class="card-title">Importer un fichier CSV</h3>
+        <p class="card-sub" style="line-height:1.7;margin:7px 0 13px">Utilisez un fichier exporté depuis KAI ou un CSV qui possède exactement les colonnes du module choisi. L’aperçu vérifie la structure avant d’ajouter les lignes.</p>
+        <div class="field">
+          <label>Module de destination</label>
+          <select [(ngModel)]="importTargetModule">
+            @for (modKey of availableModules(); track modKey) {
+              <option [value]="modKey">{{ modKey }}</option>
+            }
+          </select>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Fichier CSV</label>
+          <input type="file" (change)="onFileSelected($event)" accept=".csv,text/csv">
+        </div>
+        <div class="notice" style="margin:12px 0 0">{{ importFeedback() }}</div>
+        <div class="head-actions" style="justify-content:flex-start;margin-top:12px">
+          <button type="button" class="btn" (click)="previewImport()">Analyser le fichier</button>
+          <button type="button" class="btn primary" [disabled]="!importFileReady()" (click)="applyImport()">Importer les lignes</button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <div class="card-body">
+      <div class="card-title">Bonnes pratiques d’import</div>
+      <div class="performance-list">
+        <div class="performance-row"><span class="metric-icon">1</span><span class="metric-label">Exportez d’abord le module pour récupérer les en-têtes exacts.</span><strong class="metric-value">CSV</strong></div>
+        <div class="performance-row"><span class="metric-icon blue">2</span><span class="metric-label">Conservez le même nombre et le même ordre de colonnes.</span><strong class="metric-value">✓</strong></div>
+        <div class="performance-row"><span class="metric-icon orange">3</span><span class="metric-label">Vérifiez les références et statuts avant de confirmer l’import.</span><strong class="metric-value">⚑</strong></div>
+      </div>
+    </div>
+  </section>
+
+} @else if (moduleKey() === 'profil') {
+  <!-- Vue Profil & Sécurité -->
+  <div class="page-head">
+    <div>
+      <div class="kicker">Compte connecté</div>
+      <h1>Mon profil &amp; sécurité</h1>
+      <p>Modifiez les informations affichées pour le profil de démonstration sélectionné.</p>
+    </div>
+  </div>
+
+  <div class="notice" style="background:#fff4df;color:#916315;border:1px solid #f2e1b8">
+    <span>ⓘ</span>
+    <span>La gestion du mot de passe et de la session est illustrative. Aucune authentification réelle ni modification de mot de passe serveur n’est effectuée par ce prototype.</span>
+  </div>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="record-head" style="margin-bottom:18px">
+        <div class="record-big-avatar">{{ getInitials(profileName()) }}</div>
+        <div>
+          <div class="record-name">{{ profileName() }}</div>
+          <div class="record-sub">{{ profileRole() }}</div>
+        </div>
+      </div>
+      <form (ngSubmit)="saveProfile()">
+        <div class="form-grid">
+          <div class="field"><label>Nom complet</label><input [(ngModel)]="profileName" name="name" required></div>
+          <div class="field"><label>E-mail professionnel</label><input [(ngModel)]="profileEmail" name="email" type="email" required></div>
+          <div class="field"><label>Rôle actif</label><input [value]="profileRole()" readonly></div>
+          <div class="field"><label>Téléphone (démo)</label><input [(ngModel)]="profilePhone" name="phone"></div>
+          <div class="field"><label>Nouveau mot de passe (facultatif)</label><input [(ngModel)]="profileNewPassword" name="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum"></div>
+          <div class="field"><label>Confirmer le nouveau mot de passe</label><input [(ngModel)]="profileConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Répétez le mot de passe"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px">
+          <button class="btn primary" type="submit">Enregistrer les modifications</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+} @else if (moduleKey() === 'parametres') {
+  <!-- Vue Paramètres -->
+  <div class="page-head">
+    <div>
+      <div class="kicker">Administration de la plateforme</div>
+      <h1>Paramètres</h1>
+      <p>Personnalisez les informations de votre organisation et les préférences de suivi.</p>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Informations de l’organisation</div>
+          <div class="card-sub">Configuration de démonstration</div>
+        </div>
+      </div>
+      <form (ngSubmit)="saveSettings()">
+        <div class="form-grid">
+          <div class="field"><label>Nom de l’organisation</label><input [(ngModel)]="orgName" name="orgName" required></div>
+          <div class="field">
+            <label>Fuseau horaire</label>
+            <select [(ngModel)]="orgTimezone" name="orgTimezone">
+              <option>Africa/Dakar (GMT)</option>
+              <option>UTC</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Devise de référence</label>
+            <select [(ngModel)]="orgCurrency" name="orgCurrency">
+              <option>FCFA (XOF)</option>
+              <option>EUR</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Langue de l’interface</label>
+            <select [(ngModel)]="orgLanguage" name="orgLanguage">
+              <option>Français</option>
+              <option>English</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Site principal</label>
+            <select [(ngModel)]="orgSite" name="orgSite">
+              <option>Dakar</option>
+              <option>Diamniadio</option>
+              <option>Thiès</option>
+              <option>Rufisque</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Notifications</label>
+            <select [(ngModel)]="orgNotifications" name="orgNotifications">
+              <option>Alertes activées</option>
+              <option>Alertes désactivées</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px">
+          <button class="btn primary" type="submit">Enregistrer les préférences</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <div class="card-body">
+      <div class="card-title">Référentiels</div>
+      <div class="card-sub" style="margin:5px 0 14px">Accès rapide aux listes de valeurs configurables.</div>
+      <div class="head-actions" style="justify-content:flex-start">
+        <a class="btn" routerLink="/vehicules">Catégories de véhicules ↗</a>
+        <a class="btn" routerLink="/sim">Opérateurs SIM ↗</a>
+        <a class="btn" routerLink="/equipements">Types d’équipements ↗</a>
+      </div>
+    </div>
+  </section>
+
+} @else {
+  <!-- Vue Tableau Standard (Véhicules, Chauffeurs, Équipements, SIM, etc.) -->
+  <div class="page-head">
+    <div>
+      <div class="kicker">KAI · Gestion opérationnelle</div>
+      <h1>{{ currentModule().title }}</h1>
+      <p>{{ currentModule().desc }}</p>
+    </div>
+    <div class="head-actions">
+      <button class="btn" (click)="exportCSV()">⇩ Exporter</button>
+      @if (moduleKey() !== 'audit' && moduleKey() !== 'historique') {
+        <button class="btn primary" (click)="openCreate()">＋ {{ currentModule().button }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    @for (s of currentModule().stats; track s[1]) {
+      <div class="strip-card">
+        <span>{{ s[1] }}</span>
+        <strong>{{ s[0] }}</strong>
+      </div>
+    }
+  </div>
+
+  <div class="notice">
+    <span>ⓘ</span>
+    <span><strong>Prototype interactif.</strong> Les enregistrements affichés sont fictifs. La connexion aux API et aux droits réels sera effectuée pendant le développement.</span>
+  </div>
+
+  <section class="table-card">
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <label class="search-inline">
+          <span>⌕</span>
+          <input [(ngModel)]="searchTerm" placeholder="Rechercher dans la liste…">
+        </label>
+        <select class="filter" [(ngModel)]="statusFilter">
+          <option value="">Tous les statuts</option>
+          @for (st of statuses(); track st) {
+            <option [value]="st">{{ st }}</option>
+          }
+        </select>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn tiny" (click)="openAdvancedFilters()">☷ Filtres avancés</button>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            @for (c of currentModule().cols; track c) {
+              <th>{{ c }}</th>
+            }
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filteredRows(); track row[0]) {
+            <tr (click)="openDetail(row)">
+              @for (val of row; track $index; let idx = $index; let last = $last) {
+                @if (idx === 1 && (moduleKey() === 'chauffeurs' || moduleKey() === 'acces' || moduleKey() === 'vehicules' || moduleKey() === 'equipements' || moduleKey() === 'sim' || moduleKey() === 'maintenance' || moduleKey() === 'incidents')) {
+                  <td>
+                    <div class="cell-title">
+                      <span class="cell-avatar">{{ getInitials(val) }}</span>
+                      <div>
+                        <div class="cell-primary">{{ val }}</div>
+                        <div class="cell-secondary">{{ row[0] }}</div>
+                      </div>
+                    </div>
+                  </td>
+                } @else if (last || (moduleKey() === 'incidents' && idx === 3)) {
+                  <td>
+                    <span class="pill" [class]="getPillClass(val)">{{ val }}</span>
+                  </td>
+                } @else {
+                  <td>{{ val }}</td>
+                }
+              }
+              <td>
+                <div class="row-actions" (click)="$event.stopPropagation()">
+                  <button class="row-menu" (click)="openDetail(row)" title="Voir le détail">↗</button>
+                  
+                  @if (moduleKey() === 'documents' && row[5] !== 'Validé') {
+                    <button class="row-menu edit" (click)="validateDocument(row, $event)" title="Valider le document">✓</button>
+                  }
+                  @if (moduleKey() === 'affectations' && row[5] !== 'Restitué') {
+                    <button class="row-menu edit" (click)="returnAffectation(row, $event)" title="Enregistrer la restitution">↩</button>
+                  }
+                  @if (moduleKey() === 'restitutions' && row[5] !== 'Restitué') {
+                    <button class="row-menu edit" (click)="completeRestitution(row, $event)" title="Clôturer la restitution">✓</button>
+                  }
+
+                  @if (moduleKey() !== 'audit' && moduleKey() !== 'historique') {
+                    <button class="row-menu edit" (click)="openEdit(row)" title="Modifier">✎</button>
+                    <button class="row-menu danger" (click)="deleteRow(row, $event)" title="Supprimer">×</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="currentModule().cols.length + 1">
+                <div class="empty-state">Aucun résultat ne correspond à cette recherche.</div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>{{ filteredRows().length }} résultat{{ filteredRows().length !== 1 ? 's' : '' }} · Données de démonstration</span>
+      <div class="pagination">
+        <button disabled>‹</button>
+        <button class="active">1</button>
+        <button disabled>2</button>
+        <button disabled>3</button>
+        <button disabled>›</button>
+      </div>
+    </div>
+  </section>
+}
+
+<!-- Modal de consultation détaillée -->
+<div class="overlay" [class.open]="detailModalOpen()" (click)="closeDetail()">
+  <section class="dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-head">
+      <h2>Fiche détaillée</h2>
+      <button class="dialog-close" (click)="closeDetail()">✕</button>
+    </div>
+    <div class="dialog-body">
+      @if (selectedRow(); as row) {
+        <div class="record-head">
+          <div class="record-big-avatar">{{ getInitials(row[1] || row[0]) }}</div>
+          <div>
+            <div class="record-name">{{ row[1] || row[0] }}</div>
+            <div class="record-sub">{{ row[0] }} · fiche de démonstration</div>
+          </div>
+        </div>
+        @for (col of currentModule().cols; track col; let i = $index) {
+          <div class="info-line">
+            <span>{{ col }}</span>
+            <span>{{ row[i] || '—' }}</span>
+          </div>
+        }
+        <p class="dialog-info" style="margin:15px 0 0">Cette fiche est construite avec des données de démonstration. Les documents, l’historique et les actions métier seront liés à l’API réelle de KAI.</p>
+      }
+    </div>
+    <div class="dialog-foot">
+      <button class="btn" (click)="printRecord()">Imprimer / enregistrer en PDF ↗</button>
+      <button class="btn primary" (click)="closeDetail()">Fermer</button>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de création / modification -->
+<div class="overlay" [class.open]="createModalOpen()" (click)="closeCreate()">
+  <section class="dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-head">
+      <h2>{{ isEditing() ? 'Modifier l’enregistrement' : currentModule().button }}</h2>
+      <button class="dialog-close" (click)="closeCreate()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-info">Cette action ouvre un formulaire de démonstration. Aucune donnée ne sera envoyée ou enregistrée sur un serveur.</p>
+      <form (ngSubmit)="saveForm()">
+        <div class="form-grid">
+          @for (col of currentModule().cols; track col; let i = $index) {
+            @if (i > 0) {
+              <div class="field">
+                <label>{{ col }} *</label>
+                <input [(ngModel)]="formValues()[i]" [name]="'col_' + i" required placeholder="{{ col }}">
+              </div>
+            }
+          }
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:17px">
+          <button type="button" class="btn" (click)="closeCreate()">Annuler</button>
+          <button type="submit" class="btn primary">{{ isEditing() ? 'Enregistrer les modifications' : 'Valider la saisie' }}</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- Modal Filtres Avancés -->
+<div class="overlay" [class.open]="advancedFilterOpen()" (click)="closeAdvancedFilters()">
+  <section class="dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-head">
+      <h2>Filtres avancés</h2>
+      <button class="dialog-close" (click)="closeAdvancedFilters()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>Site</label>
+          <select [(ngModel)]="selectedSite">
+            <option>Tous les sites</option>
+            <option>Dakar</option>
+            <option>Diamniadio</option>
+            <option>Thiès</option>
+            <option>Rufisque</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Période</label>
+          <select [(ngModel)]="selectedPeriod">
+            <option>Toutes les périodes</option>
+            <option>7 derniers jours</option>
+            <option>30 derniers jours</option>
+          </select>
+        </div>
+      </div>
+      <p class="dialog-info" style="margin-top:13px">Les filtres avancés seront raccordés aux données en base dans la version applicative.</p>
+    </div>
+    <div class="dialog-foot">
+      <button class="btn" (click)="closeAdvancedFilters()">Annuler</button>
+      <button class="btn primary" (click)="applyAdvancedFilters()">Appliquer les filtres</button>
+    </div>
+  </section>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" [class.show]="toastVisible()" role="status">{{ toastMessage() }}</div>
+

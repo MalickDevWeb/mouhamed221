@@ -1,40 +1,121 @@
-<main class="login">
-  <section class="card login-card">
-    <h1>KAI · Chauffeurs & parc</h1>
-    <p class="muted">Connectez-vous pour accéder à la plateforme.</p>
-
-    @if (error(); as message) {
-      <p class="alert alert-danger" role="alert">{{ message }}</p>
-    }
-
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <label class="field">
-        <span>Adresse e-mail</span>
-        <input class="input" type="email" formControlName="email" autocomplete="username" />
-        <app-field-error [control]="form.controls.email" />
-      </label>
-      <label class="field">
-        <span>Mot de passe</span>
-        <input class="input" type="password" formControlName="password" autocomplete="current-password" />
-        <app-field-error [control]="form.controls.password" />
-      </label>
-      <button class="btn btn-primary btn-block" type="submit" [disabled]="submitting()">
-        {{ submitting() ? 'Connexion…' : 'Se connecter' }}
-      </button>
-    </form>
-
-    @if (demoMode) {
-      <div class="demo-accounts">
-        <p class="muted">Mode démo — mot de passe : <code>{{ demoPassword }}</code></p>
-        <ul>
-          @for (user of demoUsers; track user.id) {
-            <li>
-              <button type="button" class="link" (click)="fillDemo(user.email)">{{ user.email }}</button>
-              <span class="muted">{{ roleLabels[user.role] }}</span>
-            </li>
-          }
-        </ul>
+<section class="login-screen" aria-label="Connexion à KAI">
+  <div class="login-showcase">
+    <div class="login-brand">
+      <div class="login-brand-mark">K</div>
+      <div>
+        <div class="login-brand-name">KAI</div>
+        <div class="login-brand-sub">FLEET &amp; OPERATIONS</div>
       </div>
-    }
-  </section>
-</main>
+    </div>
+
+    <div class="login-hero">
+      <div class="login-kicker">Plateforme de gestion intégrée</div>
+      <h1>Le contrôle de votre flotte.<br><span>En toute clarté.</span></h1>
+      <p>Pilotez les véhicules, les chauffeurs, les équipements et les opérations depuis un espace sécurisé, conçu pour chaque métier et chaque niveau de responsabilité.</p>
+    </div>
+
+    <div>
+      <div class="login-benefits">
+        <div class="login-benefit">
+          <strong>01 · Visibilité</strong>
+          <small>Indicateurs et statuts regroupés sur une vue claire.</small>
+        </div>
+        <div class="login-benefit">
+          <strong>02 · Traçabilité</strong>
+          <small>Affectations, incidents et interventions structurés.</small>
+        </div>
+        <div class="login-benefit">
+          <strong>03 · Accès adaptés</strong>
+          <small>Navigation et actions selon le profil métier.</small>
+        </div>
+      </div>
+      <div class="login-footnote">© KAI · Prototype UI/UX de démonstration · Interface responsive</div>
+    </div>
+  </div>
+
+  <div class="login-form-side">
+    <div class="login-form-wrap">
+      <div class="login-card-heading">
+        <div class="login-eyebrow">Votre espace de travail</div>
+        <h2>Bon retour parmi nous</h2>
+        <p>Connectez-vous pour accéder à votre tableau de bord KAI.</p>
+      </div>
+
+      @if (error(); as message) {
+        <div class="login-alert" role="alert" style="background:#fff0ef;border:1px solid #f6d4d1;color:#a33e45;padding:10px 12px;border-radius:8px;margin-bottom:15px;font-size:11px;">
+          {{ message }}
+        </div>
+      }
+
+      <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="login-field">
+          <label for="kaiDemoRole">Profil de démonstration</label>
+          <select id="kaiDemoRole" (change)="onDemoRoleChange($event)">
+            <option value="admin">Administratrice · accès complet (admin@kai.demo)</option>
+            <option value="manager">Gestionnaire de parc (parc@kai.demo)</option>
+            <option value="technician">Technicienne (tech@kai.demo)</option>
+            <option value="supervisor">Superviseur (superviseur@kai.demo)</option>
+            <option value="reader">Lecteur / Auditeur · lecture seule (lecture@kai.demo)</option>
+          </select>
+        </div>
+
+        <div class="login-field">
+          <label for="kaiLoginEmail">Adresse e-mail</label>
+          <input
+            id="kaiLoginEmail"
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            placeholder="nom@entreprise.sn"
+            required
+          />
+        </div>
+
+        <div class="login-field">
+          <label for="kaiLoginPassword">Mot de passe</label>
+          <div class="login-password-wrap">
+            <input
+              id="kaiLoginPassword"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="Saisissez le mot de passe de démo"
+              required
+            />
+            <button
+              class="login-toggle-password"
+              type="button"
+              (click)="togglePassword()"
+              aria-label="Afficher le mot de passe"
+            >
+              {{ showPassword() ? 'Masquer' : 'Afficher' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="login-form-row">
+          <label class="login-checkbox">
+            <input type="checkbox" checked /> Garder cette session dans cet onglet
+          </label>
+          <button type="button" class="login-link">Mot de passe oublié ?</button>
+        </div>
+
+        <button class="login-submit" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Ouverture de votre espace…' : 'Se connecter →' }}
+        </button>
+      </form>
+
+      <div class="login-demo-tip">
+        <strong>Mode démonstration</strong> · Utilisez un profil ci-dessus. Tous les comptes de test ont le même mot de passe.
+        <div class="login-demo-credentials">
+          <span>E-mail selon le profil</span>
+          <span>Mot de passe : <strong>{{ demoPassword }}</strong></span>
+        </div>
+      </div>
+
+      <div class="login-legal">
+        En continuant, vous accédez à une maquette interactive. Elle ne constitue pas une authentification de production et ne transmet aucune donnée à un serveur.
+      </div>
+    </div>
+  </div>
+</section>

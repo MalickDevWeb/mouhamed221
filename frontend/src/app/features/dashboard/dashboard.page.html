@@ -1,55 +1,330 @@
-<section class="page">
-  <header class="page-header">
-    <h1>Tableau de bord</h1>
-  </header>
+<div class="page-head">
+  <div>
+    <div class="kicker">Mercredi 28 octobre 2026 · Vue d’ensemble</div>
+    <h1>Bonjour, Aminata 👋</h1>
+    <p>Retrouvez l’état du parc, les indicateurs clés et les opérations à suivre aujourd’hui.</p>
+  </div>
+  <div class="head-actions">
+    <div class="date-control">
+      <span class="calendar">▦</span>
+      <strong>01 oct. 2026 – 28 oct. 2026</strong>
+      <span>⌄</span>
+    </div>
+    <button class="btn" type="button" (click)="exportSummary()">⇩ Exporter le rapport</button>
+  </div>
+</div>
 
-  @switch (state().kind) {
-    @case ('loading') {
-      <p class="muted">Chargement des indicateurs…</p>
-    }
-    @case ('error') {
-      <p class="alert alert-danger">Impossible de charger les indicateurs.</p>
-    }
-  }
+<div class="head-actions" style="justify-content:flex-start;margin-bottom:13px">
+  <div class="segmented" role="tablist" aria-label="Vue analytique">
+    <button [class.active]="activeTab() === 'costs'" (click)="setTab('costs')" role="tab">⌁ Coûts &amp; parc</button>
+    <button [class.active]="activeTab() === 'performance'" (click)="setTab('performance')" role="tab">▥ Performance</button>
+  </div>
+  <span style="font-size:9px;color:#8b9ab0;margin-left:5px">DONNÉES DE DÉMONSTRATION</span>
+</div>
 
-  @if (summary(); as s) {
-    <div class="kpi-grid">
-      <a class="card kpi" routerLink="/chauffeurs">
-        <span class="kpi-label">Chauffeurs actifs</span>
-        <strong class="kpi-value">{{ s.driversByStatus.ACTIF }}</strong>
+<!-- Role Workspace Section -->
+<section class="card role-workspace">
+  <div class="role-workspace-body">
+    <div class="role-workspace-head">
+      <div>
+        <div class="role-workspace-title">Mon espace de travail</div>
+        <div class="role-workspace-sub">Pilotage complet, administration, sécurité, gestion du parc et suivi de toutes les opérations.</div>
+      </div>
+      <span class="role-dashboard-tag">Administratrice</span>
+    </div>
+    <div class="role-workspace-grid">
+      <a routerLink="/incidents" class="role-task">
+        <span class="role-task-icon">⚑</span>
+        <span style="min-width:0;flex:1">
+          <strong>Traiter les incidents</strong>
+          <small>4 incidents à vérifier</small>
+        </span>
+        <span style="color:#7e91aa">↗</span>
       </a>
-      <a class="card kpi" routerLink="/affectations">
-        <span class="kpi-label">Affectations actives</span>
-        <strong class="kpi-value">{{ s.activeAssignments }}</strong>
+      <a routerLink="/affectations" class="role-task">
+        <span class="role-task-icon">⇄</span>
+        <span style="min-width:0;flex:1">
+          <strong>Affectations</strong>
+          <small>2 restitutions attendues</small>
+        </span>
+        <span style="color:#7e91aa">↗</span>
       </a>
-      <a class="card kpi" routerLink="/equipements">
-        <span class="kpi-label">Équipements disponibles</span>
-        <strong class="kpi-value">{{ s.equipmentByStatus.DISPONIBLE }}</strong>
+      <a routerLink="/integration" class="role-task">
+        <span class="role-task-icon">✓</span>
+        <span style="min-width:0;flex:1">
+          <strong>Intégrations</strong>
+          <small>3 dossiers incomplets</small>
+        </span>
+        <span style="color:#7e91aa">↗</span>
       </a>
-      <div class="card kpi" [class.kpi-alert]="s.utilizationRate < 0.6 || s.utilizationRate > 0.95">
-        <span class="kpi-label">Taux d'utilisation du parc</span>
-        <strong class="kpi-value">{{ s.utilizationRate | percent: '1.0-0' }}</strong>
-        <span class="muted">Seuil d'alerte : hors de 60 % à 95 %</span>
+    </div>
+  </div>
+</section>
+
+<!-- 4 KPI Cards -->
+<section class="kpis">
+  <article class="kpi">
+    <div class="kpi-top">
+      <span class="kpi-label">Véhicules actifs</span>
+      <span class="kpi-icon">▰</span>
+    </div>
+    <div class="kpi-bottom">
+      <strong class="kpi-value">124</strong>
+      <span class="trend">↗ +2,4 %</span>
+    </div>
+    <div class="kpi-foot">par rapport au mois précédent</div>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi-top">
+      <span class="kpi-label">Chauffeurs actifs</span>
+      <span class="kpi-icon">♙</span>
+    </div>
+    <div class="kpi-bottom">
+      <strong class="kpi-value">87</strong>
+      <span class="trend">↗ +1,8 %</span>
+    </div>
+    <div class="kpi-foot">sur 92 dossiers validés</div>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi-top">
+      <span class="kpi-label">Interventions en cours</span>
+      <span class="kpi-icon">⚒</span>
+    </div>
+    <div class="kpi-bottom">
+      <strong class="kpi-value">12</strong>
+      <span class="trend down">↘ −1,5 %</span>
+    </div>
+    <div class="kpi-foot">3 demandent une attention</div>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi-top">
+      <span class="kpi-label">Coût total de la période</span>
+      <span class="kpi-icon">◉</span>
+    </div>
+    <div class="kpi-bottom">
+      <strong class="kpi-value currency">84 196 500 <small style="font-size:10px;letter-spacing:0">FCFA</small></strong>
+      <span class="trend">↗ +3,1 %</span>
+    </div>
+    <div class="kpi-foot">Montant fictif pour la maquette</div>
+  </article>
+</section>
+
+<!-- Grid 2-col: Donut + Line Chart -->
+<section class="grid two-col">
+  <!-- Card: Répartition des dépenses -->
+  <article class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Répartition des dépenses</div>
+          <div class="card-sub">Répartition indicative par catégorie</div>
+        </div>
+        <a routerLink="/analytics" class="btn tiny">Détails ↗</a>
+      </div>
+      <div class="donut-layout">
+        <div class="donut-wrap">
+          <div class="donut-chart"></div>
+          <div class="donut-center">
+            <span>Total des dépenses</span>
+            <strong>84,2 M</strong>
+            <small>FCFA</small>
+          </div>
+        </div>
+        <div class="legend-list">
+          <div class="legend-row">
+            <span class="legend-name"><i class="legend-dot teal" style="background:#18a88a"></i>Carburant</span>
+            <strong>26 %</strong>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><i class="legend-dot orange"></i>Maintenance</span>
+            <strong>13 %</strong>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><i class="legend-dot green"></i>Assurance</span>
+            <strong>13 %</strong>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><i class="legend-dot purple"></i>Pièces détachées</span>
+            <strong>16 %</strong>
+          </div>
+          <div class="legend-row">
+            <span class="legend-name"><i class="legend-dot blue"></i>Autres</span>
+            <strong>32 %</strong>
+          </div>
+        </div>
       </div>
     </div>
+  </article>
 
-    <div class="grid-2">
-      <section class="card">
-        <h2>Chauffeurs par statut</h2>
-        <dl class="stat-list">
-          @for (status of driverStatuses; track status) {
-            <div><dt>{{ driverLabels[status] }}</dt><dd>{{ s.driversByStatus[status] }}</dd></div>
-          }
-        </dl>
-      </section>
-      <section class="card">
-        <h2>Parc par statut</h2>
-        <dl class="stat-list">
-          @for (status of equipmentStatuses; track status) {
-            <div><dt>{{ equipmentLabels[status] }}</dt><dd>{{ s.equipmentByStatus[status] }}</dd></div>
-          }
-        </dl>
-      </section>
+  <!-- Card: Tendance des coûts -->
+  <article class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Tendance des coûts</div>
+          <div class="card-sub">Coût moyen et fréquence des interventions</div>
+        </div>
+        <div class="segmented" style="flex-shrink:0">
+          <button [class.active]="trendPeriod() === 'monthly'" (click)="setTrendPeriod('monthly')">Mensuel</button>
+          <button [class.active]="trendPeriod() === 'yearly'" (click)="setTrendPeriod('yearly')">Annuel</button>
+        </div>
+      </div>
+      <div class="legend" style="margin:0 0 5px">
+        <span class="legend-item"><i class="legend-dot blue"></i>Coût moyen / véhicule</span>
+        <span class="legend-item"><i class="legend-dot" style="background:#23b187"></i>Interventions</span>
+      </div>
+      <svg class="trend-chart" id="trendChart" viewBox="0 0 560 220" preserveAspectRatio="none" role="img" aria-label="Graphique des tendances des coûts">
+        <g class="chart-grid">
+          <path d="M42 25H545 M42 69H545 M42 113H545 M42 157H545 M42 194H545"/>
+        </g>
+        <g class="chart-label">
+          <text x="4" y="29">100%</text>
+          <text x="10" y="73">75%</text>
+          <text x="10" y="117">50%</text>
+          <text x="10" y="161">25%</text>
+          <text x="22" y="198">0%</text>
+          <text x="42" y="213">Jan</text>
+          <text x="143" y="213">Fév</text>
+          <text x="244" y="213">Mars</text>
+          <text x="344" y="213">Avr</text>
+          <text x="445" y="213">Mai</text>
+          <text x="529" y="213">Juin</text>
+        </g>
+        <path class="line-blue" id="blueLine" d="M42 103 C62 90 70 91 85 94 S115 71 137 69 S166 90 188 77 S219 85 237 100 S263 111 282 103 S310 119 333 104 S360 87 381 94 S410 83 429 72 S464 92 482 86 S510 100 528 84 S538 79 545 71"/>
+        <path class="line-green" id="greenLine" d="M42 139 C60 128 70 137 85 130 S112 145 137 135 S159 117 180 129 S210 140 236 125 S261 131 281 139 S302 151 321 139 S346 148 366 142 S392 157 410 143 S438 130 458 140 S489 151 508 142 S532 127 545 137"/>
+      </svg>
+      <div class="chart-caption">
+        <span>Source : valeurs fictives</span>
+        <span id="chartPeriodLabel">Jan – Juin 2026</span>
+      </div>
     </div>
-  }
+  </article>
+</section>
+
+<!-- Lower Grid: Performance + Responsables -->
+<section class="grid lower-grid">
+  <!-- Card: Performance opérationnelle -->
+  <article class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Performance opérationnelle</div>
+          <div class="card-sub">Indicateurs clés de la flotte</div>
+        </div>
+        <a routerLink="/analytics" class="btn tiny">Voir tout ↗</a>
+      </div>
+      <div class="performance-list">
+        <div class="performance-row">
+          <span class="metric-icon">✓</span>
+          <span class="metric-label">Disponibilité de la flotte</span>
+          <strong class="metric-value">92<small>%</small></strong>
+        </div>
+        <div class="performance-row">
+          <span class="metric-icon blue">▰</span>
+          <span class="metric-label">Consommation moyenne</span>
+          <strong class="metric-value">14,8 <small>L / 100 km</small></strong>
+        </div>
+        <div class="performance-row">
+          <span class="metric-icon purple">↗</span>
+          <span class="metric-label">Taux de panne</span>
+          <strong class="metric-value">4,2<small>%</small></strong>
+        </div>
+        <div class="performance-row">
+          <span class="metric-icon orange">₣</span>
+          <span class="metric-label">Coût moyen / véhicule</span>
+          <strong class="metric-value">678 500 <small>FCFA</small></strong>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card: Responsables maintenance -->
+  <article class="card">
+    <div class="card-body">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Responsables maintenance</div>
+          <div class="card-sub">Suivi indicatif des interventions par responsable</div>
+        </div>
+        <a routerLink="/maintenance" class="btn tiny">Voir équipe ↗</a>
+      </div>
+      <div class="leader-list">
+        <div class="leader-row">
+          <div class="leader-avatar">AS</div>
+          <div>
+            <div class="leader-name">Alexandre Sarr</div>
+            <div class="leader-meta">91,0 M FCFA · 24 interventions</div>
+          </div>
+          <div class="leader-bars">
+            <div class="track"><div class="fill" style="width:64%"></div></div>
+            <div class="track"><div class="fill green" style="width:81%"></div></div>
+          </div>
+        </div>
+        <div class="leader-row">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,#f8e5d7,#e4bac5);color:#8a4c60">MF</div>
+          <div>
+            <div class="leader-name">Marie Fall</div>
+            <div class="leader-meta">24,2 M FCFA · 19 interventions</div>
+          </div>
+          <div class="leader-bars">
+            <div class="track"><div class="fill" style="width:52%"></div></div>
+            <div class="track"><div class="fill green" style="width:74%"></div></div>
+          </div>
+        </div>
+        <div class="leader-row">
+          <div class="leader-avatar" style="background:linear-gradient(135deg,#f2e3d2,#cfdae9);color:#4c6688">LK</div>
+          <div>
+            <div class="leader-name">Lucas Kane</div>
+            <div class="leader-meta">16,7 M FCFA · 12 interventions</div>
+          </div>
+          <div class="leader-bars">
+            <div class="track"><div class="fill" style="width:49%"></div></div>
+            <div class="track"><div class="fill teal" style="width:64%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- Card: Activité récente -->
+<section class="card" style="margin-top:15px">
+  <div class="card-body">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Activité récente</div>
+        <div class="card-sub">Dernières opérations enregistrées dans la maquette</div>
+      </div>
+      <a routerLink="/incidents" class="btn tiny">Tous les événements ↗</a>
+    </div>
+    <div class="leader-list">
+      <div class="leader-row">
+        <div class="leader-avatar">⇄</div>
+        <div>
+          <div class="leader-name">Nouvelle affectation de matériel</div>
+          <div class="leader-meta">Mamadou Ndiaye · Samsung Galaxy A54</div>
+        </div>
+        <span class="cell-secondary">Il y a 18 min</span>
+      </div>
+      <div class="leader-row">
+        <div class="leader-avatar" style="background:#e8f7ef;color:#21835e">✓</div>
+        <div>
+          <div class="leader-name">Dossier d’intégration mis à jour</div>
+          <div class="leader-meta">Aminata Diop · 6 étapes complétées</div>
+        </div>
+        <span class="cell-secondary">Il y a 1 h</span>
+      </div>
+      <div class="leader-row">
+        <div class="leader-avatar" style="background:#fff0df;color:#aa6e22">⚑</div>
+        <div>
+          <div class="leader-name">Incident matériel déclaré</div>
+          <div class="leader-meta">Galaxy A34 · Batterie défectueuse</div>
+        </div>
+        <span class="cell-secondary">Il y a 2 h</span>
+      </div>
+    </div>
+  </div>
 </section>
