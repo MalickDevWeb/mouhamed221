@@ -5,6 +5,7 @@ import { catchError, throwError } from 'rxjs';
 
 import { SessionStore } from '../auth/session.store';
 import { ApiError, FieldError } from './api-error';
+import { API_BASE_URL, isApiRequest } from './api.config';
 
 interface ProblemDetails {
   title?: string;
@@ -22,8 +23,11 @@ const DEFAULT_TITLES: Record<number, string> = {
   422: 'Opération non autorisée dans cet état.',
 };
 
-/** Convertit toute erreur HTTP en ApiError et gère l'expiration de session (EF-02). */
+/** Convertit les erreurs de notre API en ApiError et gère l'expiration de session (EF-02). */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  if (!isApiRequest(req.url, inject(API_BASE_URL))) {
+    return next(req);
+  }
   const session = inject(SessionStore);
   const router = inject(Router);
 
